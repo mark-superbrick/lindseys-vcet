@@ -15,9 +15,9 @@ document.addEventListener("DOMContentLoaded", () => {
     gsap.from(split.words, {
       opacity: 0,
       y: 20,
-      duration: 0.5,
-      stagger: 0.1,
-      ease: "power2.out"
+      duration: .7,
+      stagger: 0.13,
+      ease: "power2.in"
     });
   }
 });

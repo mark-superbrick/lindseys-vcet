@@ -638,3 +638,18 @@ svg {
   stroke: currentColor;
   vector-effect: non-scaling-stroke;
 }
+
+
+
+
+
+
+
+.split-word-mask {
+  overflow: hidden;
+  display: inline-block;
+}
+
+.split-word {
+  display: inline-block;
+}

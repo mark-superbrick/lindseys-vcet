@@ -109,16 +109,29 @@ function homeIntro() {
       type: "words",
       wordsClass: "split-word"
     });
+
+      
+    // Wrap each word in a mask span for a reveal effect
+    splitInstance.words.forEach((word) => {
+      const mask = document.createElement('span');
+      mask.className = 'split-word-mask';
+      // Ensure mask behaves as an inline-block with overflow hidden
+      gsap.set(mask, { display: 'inline-block', overflow: 'hidden' });
+  
+      word.parentNode.insertBefore(mask, word);
+      mask.appendChild(word);
+    });
+  
     
     // Create timeline for the animation
     introTimeline = gsap.timeline();
     
     // Animate the words
     introTimeline.from(splitInstance.words, {
-      opacity: 0,
-      y: 20,
+      // opacity: 0,
+      yPercent: 100,
       stagger: 0.05,
-      ease: "power2.in"
+      ease: "power2.inOut"
     });
     
     // Add cardsOut animation at the same time

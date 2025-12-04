@@ -296,6 +296,7 @@ h1 {
   display: inline-block;
   position: relative;
   overflow: visible;
+  z-index: 5;
 }
 .hero_visual.is-secondary {
   --_theme---text: var(--base-color--primary-600);

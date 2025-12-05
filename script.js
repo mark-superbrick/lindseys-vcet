@@ -33,19 +33,19 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const offsetX = finalX - viewportCenterX;
         const offsetY = finalY - viewportCenterY * 0.85;
-        const distance = Math.sqrt(offsetX * offsetX + offsetY * offsetY);
+        // const distance = Math.sqrt(offsetX * offsetX + offsetY * offsetY);
 
         return {
           visual,
           offsetX,
           offsetY,
           rotation,
-          distance,
+          // distance,
         };
       });
 
       // furthest from center first
-      data.sort((a, b) => b.distance - a.distance);
+      // data.sort((a, b) => b.distance - a.distance);
 
       return data;
     }
@@ -58,27 +58,24 @@ document.addEventListener("DOMContentLoaded", () => {
 
       const sortedElements = cardsData.map((d) => d.visual);
 
-      // clean transform basis
-      tl.set(sortedElements, {
-        xPercent: 0,
-        yPercent: 0,
-      });
-
-      // from bottom of viewport to center cluster
+      // from bottom, no rotation or X/Y offsets
       tl.fromTo(
         sortedElements,
         {
           x: (i) => -cardsData[i].offsetX,
           y: window.innerHeight,
+          // rotation: 0,
         },
         {
+          // move into a centered cluster, still no rotation
           x: (i) => -cardsData[i].offsetX,
           y: (i) => -cardsData[i].offsetY,
-          duration: 0.6,
+          // rotation: 0,
+          duration: 0.75,
           ease: "power4.out",
           stagger: {
             from: "start",
-            amount: "0.6",
+            amount: 0.6,
           },
         },
         0
@@ -96,6 +93,8 @@ document.addEventListener("DOMContentLoaded", () => {
       const sortedElements = cardsData.map((d) => d.visual);
       const rotations = cardsData.map((d) => d.rotation);
 
+      // start from the centered cluster produced by cardsIn
+      // then fan out to final positions with rotation and final offsets
       timeline.to(
         sortedElements,
         {
@@ -104,8 +103,8 @@ document.addEventListener("DOMContentLoaded", () => {
           rotation: (index) => rotations[index],
           xPercent: -50,
           yPercent: -50,
-          duration: 0.8,
-          ease: "expo.inOut",
+          duration: 0.7,
+          ease: "expo.in",
           stagger: {
             from: "random",
             amount: 0.4,

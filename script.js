@@ -9,6 +9,64 @@ document.addEventListener("DOMContentLoaded", () => {
     let introTimeline = null;
     const heroWrap = document.querySelector(".home_hero_wrap");
 
+    function cardsIn() {
+      const tl = gsap.timeline();
+      const heroVisuals = heroWrap.querySelectorAll(".hero_visual");
+
+      if (!heroVisuals.length) return tl;
+
+      const viewportCenterX = window.innerWidth / 2;
+      const viewportCenterY = window.innerHeight / 2;
+
+      const elementsData = Array.from(heroVisuals).map((visual) => {
+        const rect = visual.getBoundingClientRect();
+        const finalX = rect.left + rect.width / 2;
+        const finalY = rect.top + rect.height / 2;
+
+        const offsetX = finalX - viewportCenterX;
+        const offsetY = finalY - viewportCenterY * 0.75;
+
+        const distance = Math.sqrt(offsetX * offsetX + offsetY * offsetY);
+
+        return {
+          visual,
+          offsetX,
+          offsetY,
+          distance,
+        };
+      });
+
+      // sort for a nice stagger order
+      elementsData.sort((a, b) => b.distance - a.distance);
+
+      const sortedElements = elementsData.map((d) => d.visual);
+
+      // start below the viewport, horizontally aligned to the future center stack
+      tl.set(sortedElements, {
+        x: (i) => -elementsData[i].offsetX,
+        y: (i) => -elementsData[i].offsetY + window.innerHeight * 0.7,
+        xPercent: 0,
+        yPercent: 0,
+      });
+
+      // move up to the "center" cluster
+      tl.to(
+        sortedElements,
+        {
+          y: (i) => -elementsData[i].offsetY,
+          duration: 0.6,
+          ease: "expo.out",
+          stagger: {
+            from: "random",
+            amount: 0.4,
+          },
+        },
+        0
+      );
+
+      return tl;
+    }
+
     function cardsOut(timeline) {
       const heroVisuals = heroWrap.querySelectorAll(
         ".hero_visual"
@@ -142,10 +200,13 @@ document.addEventListener("DOMContentLoaded", () => {
         // Create timeline for the animation
         introTimeline = gsap.timeline();
 
-        // Animate the words
+        // 1. cardsIn, from bottom to center cluster
+        const cardsInTimeline = cardsIn();
+        introTimeline.add(cardsInTimeline, 0);
+
+        // 2. split text words
         introTimeline
           .from(splitInstance.words, {
-            // opacity: 0,
             yPercent: 100,
             stagger: 0.05,
             ease: "power2.inOut",
@@ -181,7 +242,7 @@ document.addEventListener("DOMContentLoaded", () => {
               delay: 0,
               ease: "power2.out",
             },
-            "<"
+            "-=0.2"
           )
           .from(
             navbarWrap,
@@ -192,11 +253,13 @@ document.addEventListener("DOMContentLoaded", () => {
               delay: 0,
               ease: "power2.out",
             },
-            "<"
+            "-=0.2"
           );
 
-        // Add cardsOut animation at the same time
-        cardsOut(introTimeline);
+        // 5. cardsOut after cardsIn and text
+        const cardsTimeline = gsap.timeline();
+        cardsOut(cardsTimeline);
+        introTimeline.add(cardsTimeline, ">");
       }
     }
 

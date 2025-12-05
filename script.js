@@ -8,7 +8,7 @@ document.addEventListener("DOMContentLoaded", () => {
     let splitInstance = null;
     let introTimeline = null;
     const heroWrap = document.querySelector(".home_hero_wrap");
-
+    
     function cardsIn() {
       const tl = gsap.timeline();
       const heroVisuals = heroWrap.querySelectorAll(".hero_visual");
@@ -41,18 +41,21 @@ document.addEventListener("DOMContentLoaded", () => {
 
       const sortedElements = elementsData.map((d) => d.visual);
 
-      // start below the viewport, horizontally aligned to the future center stack
+      // make sure transforms are in a clean state
       tl.set(sortedElements, {
-        x: (i) => -elementsData[i].offsetX,
-        y: (i) => -elementsData[i].offsetY + window.innerHeight * 0.7,
         xPercent: 0,
         yPercent: 0,
       });
 
-      // move up to the "center" cluster
-      tl.to(
+      // from bottom of viewport to the "center cluster"
+      tl.fromTo(
         sortedElements,
         {
+          x: (i) => -elementsData[i].offsetX,
+          y: window.innerHeight,
+        },
+        {
+          x: (i) => -elementsData[i].offsetX,
           y: (i) => -elementsData[i].offsetY,
           duration: 0.6,
           ease: "expo.out",
@@ -154,63 +157,67 @@ document.addEventListener("DOMContentLoaded", () => {
         );
       }
     }
-
     function homeIntro() {
-      // GSAP SplitText effect for .home_hero_wrap h1
       const heroH1 = heroWrap.querySelector("h1.heading-style-display");
       const homeParagraph = heroWrap.querySelector(".home_hero_paragraph");
       const buttonGroupEl = heroWrap.querySelector(".button-group");
       const videoWrap = document.querySelector(".home_fullimage_wrap");
-
       const navbarWrap = document.querySelector(
         ".section_navigation1-light.w-nav"
       );
 
-      // console.log(heroH1);
       if (heroH1 && typeof SplitText !== "undefined") {
-        // Revert previous split if it exists
         if (splitInstance) {
           splitInstance.revert();
           splitInstance = null;
         }
 
-        // Kill previous timeline if it exists
         if (introTimeline) {
           introTimeline.kill();
           introTimeline = null;
         }
 
-        // Split text into words using SplitText plugin
         splitInstance = new SplitText(heroH1, {
           type: "words",
           wordsClass: "split-word",
         });
 
-        // Wrap each word in a mask span for a reveal effect
         splitInstance.words.forEach((word) => {
           const mask = document.createElement("span");
           mask.className = "split-word-mask";
-          // Ensure mask behaves as an inline-block with overflow hidden
           gsap.set(mask, { display: "inline-block", overflow: "hidden" });
 
           word.parentNode.insertBefore(mask, word);
           mask.appendChild(word);
         });
 
-        // Create timeline for the animation
         introTimeline = gsap.timeline();
 
-        // 1. cardsIn, from bottom to center cluster
+        // 1. cardsIn first
         const cardsInTimeline = cardsIn();
         introTimeline.add(cardsInTimeline, 0);
 
-        // 2. split text words
-        introTimeline
-          .from(splitInstance.words, {
+        // label for the next phase
+        introTimeline.add("reveal");
+
+        // 2. cardsOut at the same time as SplitText
+        const cardsOutTimeline = gsap.timeline();
+        cardsOut(cardsOutTimeline);
+        introTimeline.add(cardsOutTimeline, "reveal");
+
+        // 2. SplitText headline reveals (same time as cardsOut)
+        introTimeline.from(
+          splitInstance.words,
+          {
             yPercent: 100,
             stagger: 0.05,
             ease: "power2.inOut",
-          })
+          },
+          "reveal"
+        );
+
+        // 3. Paragraph, buttons, video, navbar as you set
+        introTimeline
           .from(
             homeParagraph,
             {
@@ -255,11 +262,6 @@ document.addEventListener("DOMContentLoaded", () => {
             },
             "-=0.2"
           );
-
-        // 5. cardsOut after cardsIn and text
-        const cardsTimeline = gsap.timeline();
-        cardsOut(cardsTimeline);
-        introTimeline.add(cardsTimeline, ">");
       }
     }
 

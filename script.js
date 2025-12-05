@@ -1,5 +1,5 @@
 document.addEventListener("DOMContentLoaded", () => {
-  console.log("from github, ready");
+  console.log("ready");
 
   document.fonts.ready.then(() => {
     console.log("fonts ready");
@@ -32,7 +32,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         const offsetX = finalX - viewportCenterX;
-        const offsetY = finalY - viewportCenterY * 0.75;
+        const offsetY = finalY - viewportCenterY * 0.85;
         const distance = Math.sqrt(offsetX * offsetX + offsetY * offsetY);
 
         return {
@@ -75,10 +75,10 @@ document.addEventListener("DOMContentLoaded", () => {
           x: (i) => -cardsData[i].offsetX,
           y: (i) => -cardsData[i].offsetY,
           duration: 0.6,
-          ease: "expo.out",
+          ease: "power4.out",
           stagger: {
-            from: "random",
-            amount: 0.4,
+            from: "start",
+            amount: "0.6",
           },
         },
         0
@@ -103,8 +103,8 @@ document.addEventListener("DOMContentLoaded", () => {
           y: 0,
           rotation: (index) => rotations[index],
           xPercent: -50,
-          yPercent: -30,
-          duration: 0.7,
+          yPercent: -50,
+          duration: 0.8,
           ease: "expo.inOut",
           stagger: {
             from: "random",
@@ -114,12 +114,12 @@ document.addEventListener("DOMContentLoaded", () => {
         0
       );
     }
-    
-        function homeIntro() {
+
+    function homeIntro() {
       const heroH1 = heroWrap.querySelector("h1.heading-style-display");
       const homeParagraph = heroWrap.querySelector(".home_hero_paragraph");
       const buttonGroupEl = heroWrap.querySelector(".button-group");
-      const videoWrap = document.querySelector(".home_fullimage_wrap");
+      // const videoWrap = document.querySelector(".home_fullimage_wrap");
       const navbarWrap = document.querySelector(
         ".section_navigation1-light.w-nav"
       );
@@ -197,6 +197,7 @@ document.addEventListener("DOMContentLoaded", () => {
             },
             "<"
           )
+          /** /
           .from(
             videoWrap,
             {
@@ -208,6 +209,7 @@ document.addEventListener("DOMContentLoaded", () => {
             },
             "-=.02"
           )
+          /**/
           .from(
             navbarWrap,
             {
@@ -221,14 +223,6 @@ document.addEventListener("DOMContentLoaded", () => {
           );
       }
     }
-
-    // Remove [data-prevent-flicker]
-    const preventFlicker = document.querySelectorAll("[data-prevent-flicker]");
-    preventFlicker.forEach((flicker) => {
-      gsap.set(flicker, {
-        opacity: 1,
-      });
-    });
 
     // Initialize the intro animation
     homeIntro();

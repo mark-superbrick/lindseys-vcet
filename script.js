@@ -1,10 +1,14 @@
 document.addEventListener("DOMContentLoaded", () => {
-  console.log("ready");
+  console.log("github ready");
 
   document.fonts.ready.then(() => {
     console.log("fonts ready");
 
-    const debug = true; // if true, display the reset animation button
+    const debug = false; // if true, display the reset animation button
+    if (debug) {
+      document.documentElement.classList.add("debug-mode");
+    }
+
     let splitInstance = null;
     let introTimeline = null;
     const heroWrap = document.querySelector(".home_hero_wrap");
@@ -14,13 +18,14 @@ document.addEventListener("DOMContentLoaded", () => {
       const heroVisuals = heroWrap.querySelectorAll(".hero_visual");
       if (!heroVisuals.length) return null;
 
-      const viewportCenterX = window.innerWidth / 2;
-      const viewportCenterY = window.innerHeight / 2;
+      const heroRect = heroWrap.getBoundingClientRect();
+      const wrapCenterX = heroRect.left + heroRect.width / 2;
+      const wrapCenterY = heroRect.top + heroRect.height / 2;
 
       const data = Array.from(heroVisuals).map((visual) => {
         const rect = visual.getBoundingClientRect();
-        const finalX = rect.left + rect.width / 2;
-        const finalY = rect.top + rect.height / 2;
+        const finalX = rect.left + rect.width;
+        const finalY = rect.top + rect.height;
 
         const computedStyle = window.getComputedStyle(visual);
         const transformValue = computedStyle.transform;
@@ -31,21 +36,29 @@ document.addEventListener("DOMContentLoaded", () => {
           rotation = Math.atan2(matrix.b, matrix.a) * (180 / Math.PI);
         }
 
-        const offsetX = finalX - viewportCenterX;
-        const offsetY = finalY - viewportCenterY * 0.85;
-        // const distance = Math.sqrt(offsetX * offsetX + offsetY * offsetY);
+        // offsets relative to heroWrap center
+        const offsetX = finalX - wrapCenterX;
+        const offsetY = finalY - wrapCenterY;
 
         return {
           visual,
+          finalX,
+          finalY,
           offsetX,
           offsetY,
           rotation,
-          // distance,
         };
       });
 
-      // furthest from center first
-      // data.sort((a, b) => b.distance - a.distance);
+      // optional debug
+      console.table(
+        data.map((d) => ({
+          finalX: d.finalX,
+          finalY: d.finalY,
+          offsetX: d.offsetX,
+          offsetY: d.offsetY,
+        }))
+      );
 
       return data;
     }
@@ -104,7 +117,7 @@ document.addEventListener("DOMContentLoaded", () => {
           xPercent: -50,
           yPercent: -50,
           duration: 0.7,
-          ease: "expo.in",
+          ease: "power4.inOut",
           stagger: {
             from: "random",
             amount: 0.4,
@@ -248,6 +261,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const resetButton = document.createElement("button");
       resetButton.type = "button";
       resetButton.className = "button_wrap";
+      resetButton.classList.add("debugger");
       resetButton.textContent = "Reset Animation";
       resetButton.addEventListener("click", () => resetIntro.restart(true));
 

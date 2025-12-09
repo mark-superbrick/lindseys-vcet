@@ -1,5 +1,5 @@
 document.addEventListener("DOMContentLoaded", () => {
-  console.log("github ready");
+  console.log("ready");
 
   document.fonts.ready.then(() => {
     console.log("fonts ready");
@@ -50,15 +50,15 @@ document.addEventListener("DOMContentLoaded", () => {
         };
       });
 
-      // optional debug
-      console.table(
-        data.map((d) => ({
-          finalX: d.finalX,
-          finalY: d.finalY,
-          offsetX: d.offsetX,
-          offsetY: d.offsetY,
-        }))
-      );
+      // // optional debug
+      // console.table(
+      //   data.map((d) => ({
+      //     finalX: d.finalX,
+      //     finalY: d.finalY,
+      //     offsetX: d.offsetX,
+      //     offsetY: d.offsetY,
+      //   }))
+      // );
 
       return data;
     }
@@ -135,6 +135,14 @@ document.addEventListener("DOMContentLoaded", () => {
       const navbarWrap = document.querySelector(
         ".section_navigation1-light.w-nav"
       );
+
+      // show [data-prevent-flicker]
+      let preventedFlicker = document.querySelectorAll(
+        "[data-prevent-flicker]"
+      );
+      preventedFlicker.forEach((prevent) => {
+        gsap.set(prevent, { autoAlpha: 1 });
+      });
 
       if (heroH1 && typeof SplitText !== "undefined") {
         if (splitInstance) {
@@ -251,7 +259,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // Expose reset function globally so it can be called by a button
     window.resetIntroAnimation = () => resetIntro.restart(true);
 
-    // Create and add reset button to .button-group
+    // Create and add reset button to .button-group, set debug=true in line 7 to activate
     const buttonGroup = document.querySelector(".home_hero_wrap .button-group");
 
     if (buttonGroup && debug) {
